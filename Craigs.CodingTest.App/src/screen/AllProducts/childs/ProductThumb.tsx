@@ -1,58 +1,37 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux"
-import { bindActionCreators } from "redux";
-
-import { Box, Paper, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Pagination from '@material-ui/lab/Pagination';
 
-import { actionCreators, RootState} from "../../_redux/index";
-
-import {Product} from "../../_interfaces/product";
-import ProductCard from "../../components/ProductCard";
+import Loading from "../../../components/Loading";
+import {Product} from "../../../_interfaces/product";
+import ProductCard from "../../../components/ProductCard";
 
 interface IProps {
-  history: {
-    push(url: string): void;
-  };
-  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  component: string,
-  count: number,
-  page: number
+  data: Product[],
+  handleSelect: (id: number) => void;
 }
 
-const ProductList = (props: IProps) =>  {
+const ProductThumb = (props: IProps) =>  {
 
-  const dispatch = useDispatch();
-  const { getProductList } = bindActionCreators(actionCreators, dispatch);
-  const productList = useSelector((state: RootState )=> state.product.productList);
+  // ------------------------------ init -------------------------- //
 
-
-  useEffect(() => {
-    //childsgetProductList();
-  }, []);
-
-
-  const handleSelect = (item: Product) => {
-    const id = item?.productId;
-    props.history.push(`/${id}`)
-  }
-
-
+  const { data, handleSelect } = props;
   const [page, setPage] = React.useState(1);
   const [itemPerPage, setRowsPerPage] = React.useState(21);
+  const loading = data?.length > 0;
 
   const indexOfLastPlace = page * itemPerPage;
   const indexOfFirstPlace = indexOfLastPlace - itemPerPage;
-  const currentPlaces = productList?.slice(indexOfFirstPlace, indexOfLastPlace);
+  const currentPlaces = data?.slice(indexOfFirstPlace, indexOfLastPlace);
+
+   // ------------------------------ function -------------------------- //
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
   
-
   // ------------------------------ RENDER COMPONENTS -------------------------- //
-
 
   const renderProductList = () => {
     return (
@@ -60,7 +39,7 @@ const ProductList = (props: IProps) =>  {
         {currentPlaces?.map((item: Product, index) => 
            (
             <Grid key={index} item lg={4} md={4} sm={6} xs={12}>
-              <ProductCard product = {item} onSelect={()=>handleSelect(item)}/>
+              <ProductCard product = {item} onSelect={()=>handleSelect(item?.brandId)}/>
           </Grid>
           ))}
           
@@ -70,7 +49,7 @@ const ProductList = (props: IProps) =>  {
 
   const renderPagination = () => {
     const classes = useStyles();
-    const length = Math.ceil(productList?.length/itemPerPage);
+    const length = Math.ceil(data?.length/itemPerPage);
     return (
       <Grid container spacing={2} direction="row">
         <Grid item lg={12} md={12} sm={12} xs={12}>
@@ -79,25 +58,21 @@ const ProductList = (props: IProps) =>  {
           </div>
         </Grid>
       </Grid>
-      
     )
   }
 
   //---------------------------------- MAIN RENDER -----------------------//
   return (
     
-      <Box component="fieldset" mb={2} borderColor="transparent">
-          <Paper style={{ boxShadow:'none'}}>
-              {renderPagination()}
-              {renderProductList()}
-              {renderPagination()}
-          </Paper>
-          
-      </Box>
+    <div style={{ width: "100%", marginTop: 10, marginBottom: 30 }}>
+        {renderProductList()}
+        {renderPagination()}
+        <Loading loading={!loading} />
+      </div>
         
   );
 }
-export default  ProductList;
+export default  ProductThumb;
 
 
 const useStyles = makeStyles((theme) =>

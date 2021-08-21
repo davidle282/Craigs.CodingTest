@@ -7,7 +7,6 @@ interface IProps {
 
 function Loading({loading}: IProps) {
     if (loading) {
-        console.log('~~~loading: ', loading);
         return (
           <div className="loading">
             <img className="full" src={loadingGif} alt="Loading... " />
