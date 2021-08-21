@@ -1,9 +1,11 @@
-import { Action, ProductState } from "../_interfaces/product";
+import { Action, Product, ProductState } from "../_interfaces/product";
 import {
     ActionType
   } from "../_interfaces/ref";
+
+const initProductList: Product[] = []; 
 const initialState: ProductState = {
-    productList: [],
+    productList: initProductList,
     productDetails: {
         productId: 0,
         productName: '',
